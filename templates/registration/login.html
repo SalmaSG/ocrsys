@@ -4,7 +4,28 @@
   <form method="post" class="form-card">
     {% csrf_token %}
     <h1>Secure Login</h1>
-    {{ form.as_p }}
+    {% if form.non_field_errors %}
+      <div class="form-errors">{{ form.non_field_errors }}</div>
+    {% endif %}
+    <p>
+      {{ form.username.label_tag }}
+      {{ form.username }}
+      {{ form.username.errors }}
+    </p>
+    <p>
+      {{ form.password.label_tag }}
+      {{ form.password }}
+      {{ form.password.errors }}
+    </p>
+    <div class="captcha-box">
+      <span>{{ captcha_question }}</span>
+      <small>= ?</small>
+    </div>
+    <p>
+      {{ form.captcha_answer.label_tag }}
+      {{ form.captcha_answer }}
+      {{ form.captcha_answer.errors }}
+    </p>
     <button type="submit">Login</button>
     <p class="muted">New user? <a href="{% url 'register' %}">Create an account</a></p>
   </form>

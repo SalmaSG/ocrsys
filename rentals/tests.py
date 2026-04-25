@@ -29,4 +29,22 @@ class RentalSmokeTests(TestCase):
         response = self.client.get(reverse("dashboard"))
         self.assertEqual(response.status_code, 302)
 
+    def test_login_requires_valid_captcha(self):
+        self.client.get(reverse("login"))
+        session = self.client.session
+        expected = session["login_captcha_answer"]
+
+        bad_response = self.client.post(
+            reverse("login"),
+            {"username": "test_owner", "password": "owner123", "captcha_answer": expected + 1},
+        )
+        self.assertEqual(bad_response.status_code, 200)
+        self.assertContains(bad_response, "Invalid captcha code")
+
+        good_response = self.client.post(
+            reverse("login"),
+            {"username": "test_owner", "password": "owner123", "captcha_answer": expected},
+        )
+        self.assertEqual(good_response.status_code, 302)
+
 # Create your tests here.

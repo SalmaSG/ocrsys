@@ -1,3 +1,5 @@
+import random
+
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
@@ -8,6 +10,7 @@ from django.urls import reverse_lazy
 
 from .forms import (
     BookingForm,
+    CaptchaLoginForm,
     ComplaintForm,
     DeliveryRequestForm,
     MachineForm,
@@ -59,7 +62,34 @@ def home(request):
 
 class RentalLoginView(LoginView):
     template_name = "registration/login.html"
+    authentication_form = CaptchaLoginForm
     redirect_authenticated_user = True
+
+    def _set_captcha(self):
+        left = random.randint(10, 40)
+        right = random.randint(1, 20)
+        self.request.session["login_captcha_question"] = f"{left} + {right}"
+        self.request.session["login_captcha_answer"] = left + right
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == "GET":
+            self._set_captcha()
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_invalid(self, form):
+        if "login_captcha_question" not in self.request.session:
+            self._set_captcha()
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        self.request.session.pop("login_captcha_question", None)
+        self.request.session.pop("login_captcha_answer", None)
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["captcha_question"] = self.request.session.get("login_captcha_question")
+        return context
 
 
 def register(request):

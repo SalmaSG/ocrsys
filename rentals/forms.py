@@ -1,8 +1,26 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
 from .models import Booking, Complaint, DeliveryRequest, Machine, Profile, Review
+
+
+class CaptchaLoginForm(AuthenticationForm):
+    captcha_answer = forms.IntegerField(
+        label="Captcha Code",
+        help_text="Enter the answer shown in the captcha box.",
+        widget=forms.NumberInput(attrs={"placeholder": "Captcha answer"}),
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        expected = self.request.session.get("login_captcha_answer")
+        answer = cleaned.get("captcha_answer")
+        if expected is None:
+            raise forms.ValidationError("Captcha expired. Please reload the login page.")
+        if answer != expected:
+            raise forms.ValidationError("Invalid captcha code.")
+        return cleaned
 
 
 class RegistrationForm(UserCreationForm):
