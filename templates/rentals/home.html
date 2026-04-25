@@ -1,0 +1,52 @@
+{% extends "rentals/base.html" %}
+{% block content %}
+<section class="home-grid">
+  <aside class="requirements-panel">
+    <h1>Submit Your Requirements</h1>
+    <div class="mode-row">
+      <a href="{% url 'machine_create' %}">I have equipment which I want to rent</a>
+      <a href="#machines">I need equipment for rent</a>
+    </div>
+    <form class="lead-form" method="get" action="{% url 'home' %}">
+      <input name="q" value="{{ query }}" placeholder="Machine name">
+      <select name="category">
+        <option value="">All categories</option>
+        {% for category in categories %}
+          <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+        {% endfor %}
+      </select>
+      <input name="max_price" value="{{ max_price }}" type="number" min="0" placeholder="Max daily price">
+      <label class="checkline">
+        <input type="checkbox" name="available" value="1" {% if available %}checked{% endif %}>
+        Available now
+      </label>
+      <button type="submit">Search</button>
+    </form>
+  </aside>
+
+  <section class="machine-section" id="machines">
+    <div class="section-head">
+      <h2>Construction Machines</h2>
+      <p>Compare pricing, availability, owner details, and book online.</p>
+    </div>
+    <div class="machine-grid">
+      {% for machine in machines %}
+        <article class="machine-card">
+          <h3>{{ machine.name }}</h3>
+          <a class="machine-art" href="{% url 'machine_detail' machine.pk %}">
+            {% if machine.image %}
+              <img src="{{ machine.image.url }}" alt="{{ machine.name }}">
+            {% else %}
+              <span>{{ machine.category.name|slice:":1" }}</span>
+            {% endif %}
+          </a>
+          <p class="rate">₹{{ machine.daily_rate }} / day</p>
+          <a class="pricing" href="{% url 'machine_detail' machine.pk %}">See Pricing</a>
+        </article>
+      {% empty %}
+        <p class="empty">No machines match your search.</p>
+      {% endfor %}
+    </div>
+  </section>
+</section>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "rentals/base.html" %}
+{% block content %}
+<section class="invoice">
+  <h1>Invoice Generation</h1>
+  <p>Invoice #BR-{{ booking.pk|stringformat:"05d" }}</p>
+  <dl>
+    <dt>Customer</dt><dd>{{ booking.customer.username }}</dd>
+    <dt>Machine</dt><dd>{{ booking.machine.name }}</dd>
+    <dt>Duration</dt><dd>{{ booking.rental_days }} day(s)</dd>
+    <dt>Amount</dt><dd>₹{{ booking.total_amount }}</dd>
+    <dt>Payment Status</dt><dd>{{ booking.payment.get_status_display }}</dd>
+    <dt>Transaction</dt><dd>{{ booking.payment.transaction_id|default:"Pending" }}</dd>
+  </dl>
+  <a class="primary" href="{% url 'dashboard' %}">Back to Dashboard</a>
+</section>
+{% endblock %}

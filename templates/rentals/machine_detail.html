@@ -1,0 +1,44 @@
+{% extends "rentals/base.html" %}
+{% block content %}
+<section class="detail-layout">
+  <div class="detail-media">
+    {% if machine.image %}
+      <img src="{{ machine.image.url }}" alt="{{ machine.name }}">
+    {% else %}
+      <span>{{ machine.category.name|slice:":1" }}</span>
+    {% endif %}
+  </div>
+  <article class="detail-copy">
+    <p class="eyebrow">{{ machine.category.name }} · {{ machine.get_availability_status_display }}</p>
+    <h1>{{ machine.name }}</h1>
+    <p>{{ machine.description }}</p>
+    <div class="price-strip">
+      <strong>₹{{ machine.hourly_rate }}</strong><span>Hourly</span>
+      <strong>₹{{ machine.daily_rate }}</strong><span>Daily</span>
+      <strong>₹{{ machine.weekly_rate }}</strong><span>Weekly</span>
+    </div>
+    <p class="specs">{{ machine.specifications|linebreaksbr }}</p>
+    {% if user.is_authenticated %}
+      <a class="primary" href="{% url 'book_machine' machine.pk %}">Book Now</a>
+      <a class="secondary" href="{% url 'review_machine' machine.pk %}">Submit Review</a>
+    {% else %}
+      <a class="primary" href="{% url 'login' %}">Login to Book</a>
+    {% endif %}
+  </article>
+</section>
+
+<section class="content-band">
+  <h2>Customer Ratings</h2>
+  <div class="review-list">
+    {% for review in reviews %}
+      <article>
+        <strong>{{ review.rating }}/5</strong>
+        <p>{{ review.comment|default:"No written comment." }}</p>
+        <small>{{ review.customer.username }}</small>
+      </article>
+    {% empty %}
+      <p class="empty">No reviews yet.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

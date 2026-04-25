@@ -1,0 +1,32 @@
+{% extends "rentals/base.html" %}
+{% block content %}
+<section class="dashboard">
+  <div class="section-head">
+    <h1>Report Generation Module</h1>
+    <p>Rental, revenue, and machine usage reports.</p>
+  </div>
+  <div class="stats">
+    <article><strong>{{ bookings.count }}</strong><span>Rental Reports</span></article>
+    <article><strong>₹{{ revenue }}</strong><span>Revenue Reports</span></article>
+    <article><strong>{{ usage.count }}</strong><span>Machine Usage Reports</span></article>
+  </div>
+  <section class="table-wrap">
+    <h2>Machine Usage</h2>
+    <table>
+      <thead><tr><th>Machine</th><th>Category</th><th>Total Bookings</th><th>Daily Rate</th></tr></thead>
+      <tbody>
+        {% for machine in usage %}
+          <tr>
+            <td>{{ machine.name }}</td>
+            <td>{{ machine.category.name }}</td>
+            <td>{{ machine.total_bookings }}</td>
+            <td>₹{{ machine.daily_rate }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4">No usage data yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</section>
+{% endblock %}

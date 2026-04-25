@@ -1,0 +1,15 @@
+{% extends "rentals/base.html" %}
+{% block content %}
+<section class="auth-shell">
+  <form method="post" class="form-card">
+    {% csrf_token %}
+    <h1>Payment & Billing Module</h1>
+    <p><strong>Machine:</strong> {{ booking.machine.name }}</p>
+    <p><strong>Rental:</strong> {{ booking.start_date }} to {{ booking.end_date }}</p>
+    <p><strong>Total:</strong> ₹{{ booking.total_amount }}</p>
+    <label for="transaction_id">Transaction ID</label>
+    <input id="transaction_id" name="transaction_id" placeholder="UPI/CARD/NETBANKING reference">
+    <button type="submit">Pay Now</button>
+  </form>
+</section>
+{% endblock %}

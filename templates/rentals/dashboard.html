@@ -1,0 +1,63 @@
+{% extends "rentals/base.html" %}
+{% block content %}
+<section class="dashboard">
+  <div class="section-head">
+    <h1>Admin Dashboard Module</h1>
+    <p>Role: {{ role|title }}</p>
+  </div>
+  <div class="stats">
+    <article><strong>{{ machine_count }}</strong><span>Machines</span></article>
+    <article><strong>{{ booking_count }}</strong><span>Bookings</span></article>
+    <article><strong>₹{{ revenue }}</strong><span>Revenue</span></article>
+  </div>
+
+  <div class="actions">
+    <a class="primary" href="{% url 'machine_create' %}">Add Machine</a>
+    <a class="secondary" href="{% url 'reports' %}">Generate Reports</a>
+  </div>
+
+  <section class="table-wrap">
+    <h2>Booking Monitoring</h2>
+    <table>
+      <thead>
+        <tr><th>Machine</th><th>Customer</th><th>Dates</th><th>Status</th><th>Payment</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for booking in bookings %}
+          <tr>
+            <td>{{ booking.machine.name }}</td>
+            <td>{{ booking.customer.username }}</td>
+            <td>{{ booking.start_date }} to {{ booking.end_date }}</td>
+            <td>{{ booking.get_status_display }}</td>
+            <td>{% if booking.payment %}{{ booking.payment.get_status_display }}{% else %}Pending{% endif %}</td>
+            <td>
+              <a href="{% url 'invoice' booking.pk %}">Invoice</a>
+              <a href="{% url 'delivery_request' booking.pk %}">Delivery</a>
+              <a href="{% url 'complaint' booking.pk %}">Complaint</a>
+              <a href="{% url 'cancel_booking' booking.pk %}">Cancel</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6">No bookings yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="machine-strip">
+    <h2>Equipment Approval & Management</h2>
+    <div class="compact-grid">
+      {% for machine in machines %}
+        <article>
+          <strong>{{ machine.name }}</strong>
+          <span>{{ machine.category.name }} · {{ machine.get_availability_status_display }}</span>
+          <span>{% if machine.approved %}Approved{% else %}Pending approval{% endif %}</span>
+          <a href="{% url 'machine_edit' machine.pk %}">Edit</a>
+        </article>
+      {% empty %}
+        <p>No machines found.</p>
+      {% endfor %}
+    </div>
+  </section>
+</section>
+{% endblock %}
